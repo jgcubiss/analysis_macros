@@ -27,7 +27,6 @@ bool loadTrees()
 	if( gROOT->GetFile()->Get("hfs")         != NULL)  hf = (TTree*)gROOT->GetFile()->Get("hfs");
 	if( gROOT->GetFile()->Get("Broad")       != NULL)  g4 = (TTree*)gROOT->GetFile()->Get("Broad");
 	if( gROOT->GetFile()->Get("ids")         != NULL) ids = (TTree*)gROOT->GetFile()->Get("ids");
-
 	return true;
 }
 

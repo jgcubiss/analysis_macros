@@ -9,6 +9,7 @@
 #include "hfsSim.c"
 #include "KHS_sim.c"
 #include "effLege.c"
+#include "ids_coincidences.c"
 //#include "analyse_hfs.c"
 
 bool loadTrees()
@@ -26,7 +27,7 @@ bool loadTrees()
 	if( gROOT->GetFile()->Get("gg")          != NULL)  gg = (TTree*)gROOT->GetFile()->Get("gg");
 	if( gROOT->GetFile()->Get("hfs")         != NULL)  hf = (TTree*)gROOT->GetFile()->Get("hfs");
 	if( gROOT->GetFile()->Get("Broad")       != NULL)  g4 = (TTree*)gROOT->GetFile()->Get("Broad");
-	if( gROOT->GetFile()->Get("ids")         != NULL) ids = (TTree*)gROOT->GetFile()->Get("ids");
+//	if( gROOT->GetFile()->Get("ids")         != NULL) ids = (TTree*)gROOT->GetFile()->Get("ids");
 	return true;
 }
 

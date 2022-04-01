@@ -1,16 +1,14 @@
 // Function declarations
-//void readConfigFile();
 void outputConfiguration(int optionAlphaGamma, int optionGammaGamma, int optionBetaGammaGamma);
 
 // Parameters to be read from config file
-//int optionAlphaGamma=0, optionGammaGamma=0, optionBetaGammaGamma=0;
 double promptWindowAlphaGamma, promptWindowGammaGamma;
 double betaEnergyMin, betaEnergyMax;
 
 // Histos that may be used
 TH2D *ag_mat, *gg_mat, *bgg_mat;
 
-int progress=0;
+// Number of detectors/crystals to loop over
 int crystals=16, detectors=7;
 
 // Variables to match types used for values stored in

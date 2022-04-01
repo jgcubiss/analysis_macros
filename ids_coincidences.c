@@ -9,6 +9,8 @@
 //void ids_coincidences(const char* coinc)
 void ids_coincidences(int optionAlphaGamma, int optionGammaGamma, int optionBetaGammaGamma)
 {
+	// Get conditions for different histos depending on what
+	// coincidence options were selected
 	if(optionAlphaGamma==1)
 	{
 		cout << "  Alpha-gamma prompt window?\n";
@@ -122,7 +124,6 @@ void ids_coincidences(int optionAlphaGamma, int optionGammaGamma, int optionBeta
 }
 
 // Output info on what is being made to terminal
-//void outputConfiguration(int option)
 void outputConfiguration(int optionAlphaGamma, int optionGammaGamma, int optionBetaGammaGamma)
 {
 	string fileName;
@@ -133,8 +134,8 @@ void outputConfiguration(int optionAlphaGamma, int optionGammaGamma, int optionB
 	if(optionGammaGamma==1||optionBetaGammaGamma) cout << "  Gamma-Gamma coincidences, Prompt window: " << promptWindowGammaGamma << "\n";
 	if(optionBetaGammaGamma==1)
 	{
-		cout << "  Beta cut min" << betaEnergyMin << "\n";
-		cout << "  Beta cut max" << betaEnergyMax << "\n";
+		cout << "  Beta cut min: " << betaEnergyMin << "\n";
+		cout << "  Beta cut max: " << betaEnergyMax << "\n";
 	}
 	cout << "  *****************************************************\n\n";
 }

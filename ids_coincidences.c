@@ -14,21 +14,25 @@ void ids_coincidences(int optionAlphaGamma, int optionGammaGamma, int optionBeta
 	if(optionAlphaGamma==1)
 	{
 		cout << "  Alpha-gamma prompt window?\n";
-		cin  >> promptWindowAlphaGamma;
+		//cin  >> promptWindowAlphaGamma;
+		promptWindowAlphaGamma=55;
 	}
 
 
 	if(optionGammaGamma==1||optionBetaGammaGamma==1) 
 	{
 		cout << "  Gamma-gamma prompt window?\n";
-		cin  >> promptWindowGammaGamma;
+		//cin  >> promptWindowGammaGamma;
+		promptWindowGammaGamma=55;
 
 		if(optionBetaGammaGamma==1)
 		{
 			cout << "  Lower limit beta energy cut?\n";
-			cin  >> betaEnergyMin;
+			//cin  >> betaEnergyMin;
+			betaEnergyMin=20;
 			cout << "  Upper limit beta energy cut?\n";
-			cin  >> betaEnergyMax;
+			//cin  >> betaEnergyMax;
+			betaEnergyMax=2000;
 		}
 	}
 

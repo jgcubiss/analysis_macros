@@ -920,7 +920,8 @@ void zZ(const char* histo, double eMin, double eMax)
 
 void zXY(const char* histo, double xMin, double xMax, double yMin, double yMax)
 {
-	if(df->Get(histo)->InheritsFrom(TH1D::Class()))
+	TFile *df = (TFile*)gROOT->GetFile();
+	if(gROOT->GetFile()->Get(histo)->InheritsFrom(TH1D::Class()))
 	{
 		TH1D *h = (TH1D*)df->Get(histo);
 		h->GetXaxis()->SetRangeUser(xMin,xMax);
@@ -928,7 +929,7 @@ void zXY(const char* histo, double xMin, double xMax, double yMin, double yMax)
 		h->Draw();
 	}
 		
-	if(df->Get(histo)->InheritsFrom(TH2D::Class()))
+	if(gROOT->GetFile()->Get(histo)->InheritsFrom(TH2D::Class()))
 	{
 		TH2D *h = (TH2D*)df->Get(histo);
 		h->GetXaxis()->SetRangeUser(xMin,xMax);

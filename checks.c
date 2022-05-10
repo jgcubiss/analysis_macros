@@ -15,10 +15,16 @@
 #include "Math/PdfFuncMathCore.h"
 #include "TVirtualFitter.h"
 
+#include "checks.h"
+
 bool checkFile()
 {
 	if(gROOT->GetFile()) return true;
-	else return false;
+	else
+	{
+		errorFile();
+		return false;
+	}
 }
 
 void errorFile()
@@ -31,7 +37,11 @@ void errorFile()
 bool checkHisto(TFile *tmpFile, const char *nameHisto)
 {
 	if(tmpFile->Get(nameHisto)) return true;
-	else return false;
+	else 
+	{
+		errorHisto(nameHisto);
+		return false;
+	}
 }
 
 void errorHisto(const char *nameHisto)
@@ -40,3 +50,4 @@ void errorHisto(const char *nameHisto)
 	cout << "\tHisto: \"" << nameHisto << "\" does not exist\n\n\n";
 	return;
 }
+

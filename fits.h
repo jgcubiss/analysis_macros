@@ -13,3 +13,4 @@ double   bg(double *x, double *par);
 double   CB(double *x, double *par);
 double CBBG(double *x, double *par);
 double  CB1(double *x, double *par);
+TH1F *getHisto(const char *histo);

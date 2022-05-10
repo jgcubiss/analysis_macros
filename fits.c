@@ -14,18 +14,20 @@
 #include "TFitResult.h"
 #include "Math/PdfFuncMathCore.h"
 #include "TVirtualFitter.h"
+#include "TROOT.h"
 
 #include "fits.h"
 
 void gamFit(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
 {
-	TH1D *h = (TH1D*)df->Get(histo);
+	TH1F *h = getHisto(histo);
+	h->Draw("hist");
+
 	double maxArea = h->GetEntries();
 
 	double lim_Area[2]  = {10, maxArea};		// Area
 	double E_tol        = 1.5;			// +/- E est
-	double lim_sigma[3] = {0.5, 0.15, 1.5};		// sigma
-//	double lim_sigma[3] = {0.5, 0.15, 100.5};		// sigma
+	double lim_sigma[3] = {0.5, 0.35, 1.5};		// sigma
 
 	rangeMin = rMin;
 	rangeMax = rMax;
@@ -38,11 +40,13 @@ void gamFit(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
 	binFactor = h->GetBinWidth(0);
 
 	double grad = (y2-y1)/(x2-x1);
+	double offs = y2 - grad*x2;
 
 	TF1 *f1 = new TF1("f1",fGam,rangeMin,rangeMax,3+2*nOfPeaks);
 	TF1 *f2 = new TF1("f2",bg,rangeMin,rangeMax,2);
 	f1->SetNpx(1000);
 
+	f1->SetParameter(0,offs);
 	f1->SetParameter(1,grad);
 	f1->SetParameter(2,lim_sigma[0]);
 	f1->SetParLimits(2,lim_sigma[1],lim_sigma[2]);
@@ -65,7 +69,7 @@ void gamFit(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
 
 	for(int i=0; i<nOfPeaks; i++)
 	{
-		val = va_arg(vl, double);
+		val = 1.0*va_arg(vl, double);
 		ePeak.push_back(val);
 	}
 
@@ -87,9 +91,10 @@ void gamFit(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
 	}
 
 	h->Fit(f1,"R");
+	f1->Draw("same");
+
 	f2->FixParameter(0,f1->GetParameter(0));
 	f2->FixParameter(1,f1->GetParameter(1));
-//	f2->SetLineColor(kAzure+2);
 	f2->SetLineColor(4);
 	
 	TF1 *ip[nOfPeaks];
@@ -107,10 +112,11 @@ void gamFit(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
 		ip[i]->SetLineStyle(2);
 		ip[i]->SetLineWidth(2);
 		ip[i]->SetNpx(1000);
-		h->Fit(ip[i],"Q R+");
+		ip[i]->Draw("same");
+		//h->Fit(ip[i],"Q R+");
 	}
-
-	h->Fit(f2,"Q R+");
+	f2->Draw("same");
+//	h->Fit(f2,"Q R+");
 }
 
 void fitPeaks(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
@@ -175,7 +181,8 @@ void fitPeaks(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
 	sp[1]->Draw();
 	sp[1]->cd();
 
-	TH1F *alpha;
+//	TH1F *alpha;
+	TH1F *alpha = getHisto(histo);
 	if( checkHisto(df,histo) ) alpha = (TH1F*)df->Get(histo);
 	else	
 	{
@@ -279,13 +286,7 @@ void fitPeaks(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
 			}
 		}
 
-		// Set parameters of individual peaks
-/*		fP[i]->FixParameter(0,pAlpha);
-		fP[i]->FixParameter(1,pn);
-		fP[i]->FixParameter(2,pSig);
-		fP[i]->FixParameter(3,pH[i]);
-		fP[i]->FixParameter(4,pE[i]);
-*/
+		// Set parameters for individual peaks
 		fP[i]->SetParameter(0,pAlpha);
 		fP[i]->SetParameter(1,pn);
 		fP[i]->SetParameter(2,pSig);
@@ -294,10 +295,8 @@ void fitPeaks(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
 
 		// Draw and integrate peaks
 		fP[i]->SetLineColor(4);
-		//alpha->Fit(fP[i],"Q R+");
 		pIntegral.push_back((1./binFactor)*fP[i]->Integral(eMin,eMax));
 		eIntegral.push_back((1./binFactor)*fP[i]->IntegralError(eMin,eMax,fP[i]->GetParameters(),covMatrix.GetMatrixArray()));
-//		alpha->Fit(fP[i],"Q R+");
 		fP[i]->Draw("same");
 	}
 
@@ -337,12 +336,9 @@ void fitPeaks(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
 void alphasBG(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
 {
 	double lim_Area[2]  = {1, 180000};		// height
-//	double E_tol        = 10.;			// +/- E est
 	double E_tol        = 10.;			// +/- E est
 	double lim_n[3]     = {1.4, 0.7, 2.83};	// n
-//	double lim_n[3]     = {2.83, 0.9, 3.0};	// n
 	double lim_Alpha[3] = {1.65, 1.02, 1.8};	// alpha
-//	double lim_Alpha[3] = {0.52, 0.42, 1.8};	// alpha
 	double lim_Sigma[3] = {20, 2, 30};		// sigma
 
 	eMin = rMin;
@@ -441,8 +437,6 @@ void alphasBG(const char* histo, double rMin, double rMax, int nOfPeaks, ...)
 	// Fit it with binned-likelihood method
 	f1->SetNpx(500);
 	TFitResultPtr r = alpha->Fit(f1,"LL S R");
-//	TFitResultPtr r = alpha->Fit(f1,"S R");
-//	TFitResultPtr r = alpha->Fit(f1,"WW S R");
 
 	// Store fit results as histogram with confidence error intervals in order to calculate
 	// residual between fit and histo later on
@@ -595,10 +589,6 @@ void graphCB(const char* graph, double rMin, double rMax, int nOfPeaks, ...)
 	logy();
 	alpha->SetTitle("Si1+Si2 alpha spectrum");
 	alpha->GetXaxis()->SetRangeUser(rMin,rMax);
-
-	// Get binFactor
-//	binFactor = ((alpha->GetXaxis()->GetXmax())-(alpha->GetXaxis()->GetXmin()))/(alpha->GetNbinsX());
-//	cout << "\n\nTHE BIN FACTOR IS: " << binFactor << "\n";
 
 	// Declare the fit
 	TF1 *f1 = new TF1("f1",CB,eMin,eMax,nParams);
@@ -963,14 +953,11 @@ void HLFit(const char *histo, double rMin, double rMax, double HL)
 
 	TF1 *f1 = new TF1("f1","expo",rangeMin,rangeMax);
 	f1->SetNpx(1000);
-	// 
 	f1->SetParameter(1,TMath::Log(2)/HL);
 
 	h->Fit(f1,"R");
 
 	cout << "\n\n  Halflife is: " << -1.*TMath::Log(2)/f1->GetParameter(1) << " +/- " << -1.*TMath::Log(2)*f1->GetParError(1)/f1->GetParameter(1) << " s\n\n";
-
-//	h->Fit(f2,"Q R+");
 }
 
 /********************************************************
@@ -1058,3 +1045,8 @@ double CB1(double *x, double *par)
 	return H*ROOT::Math::crystalball_function(xcur, alpha, n, sigma, mu);
 }
 
+
+TH1F *getHisto(const char *histo)
+{
+	return (TH1F*)gROOT->GetFile()->Get(histo);
+}
